@@ -5,22 +5,39 @@ import android.view.Gravity
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var textGrid: Array<Array<TextView>>
+    private lateinit var textViewGrid: Array<Array<TextView>>
+
+    private lateinit var viewModel: MainViewModel
+    private val viewModelFactory: MainViewModelFactory by lazy { MainViewModelFactory(WordSearchGenerator()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         createTextGrid()
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory)[MainViewModel::class.java]
+
+        viewModel.letterGrid.observe(this, Observer { letterGrid ->
+            if (letterGrid == null || letterGrid.size != textViewGrid.size) return@Observer
+
+            letterGrid.forEachIndexed { i, row ->
+                row.forEachIndexed { j, col ->
+                    textViewGrid[i][j].text = col.toString()
+                }
+            }
+        })
     }
 
     private fun createTextGrid() {
         val grid = findViewById<GridLayout>(R.id.verticalContainer)
 
-        textGrid =
+        textViewGrid =
             Array(10) { i ->
                 Array(10) { j ->
                     createTextCell(i, j, grid)
