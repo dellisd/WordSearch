@@ -3,11 +3,11 @@ package io.github.dellisd.wordsearch
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.Gravity
-import android.view.MotionEvent
+import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.get
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.chip.Chip
@@ -38,13 +38,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.wordSearch.observe(this, Observer { (letterGrid, words) ->
             if (letterGrid.size != textViewGrid.size) return@Observer
 
-            letterGrid.forEachIndexed { i, row ->
-                row.forEachIndexed { j, col ->
-                    textViewGrid[i][j].text = col.toString()
-                }
-            }
-
-
             val chipGroup = findViewById<ChipGroup>(R.id.chipGroup)
             chipGroup.removeAllViews()
 
@@ -61,6 +54,13 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 chipGroup.addView(chip)
+            }
+        })
+        viewModel.textGrid.observe(this, Observer { letterGrid ->
+            letterGrid.forEachIndexed { i, row ->
+                row.forEachIndexed { j, col ->
+                    textViewGrid[i][j].text = col.toString()
+                }
             }
         })
     }
@@ -117,5 +117,27 @@ class MainActivity : AppCompatActivity() {
 
     private fun cellUnHighlight(cell: TextView) {
         cell.setBackgroundColor(Color.parseColor("#00FF0000"))
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        MenuInflater(this).inflate(R.menu.main, menu)
+
+        // By default, reverse words are allowed
+        menu?.get(1)?.isChecked = true
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.refresh -> viewModel.generateWordSearch()
+            R.id.reversible -> {
+                viewModel.allowReverseWords = !item.isChecked
+                item.isChecked = !item.isChecked
+            }
+            else -> {}
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 }

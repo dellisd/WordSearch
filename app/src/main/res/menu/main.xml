@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/refresh"
+            app:showAsAction="ifRoom"
+            android:title="@string/new_word_search"
+            android:icon="@drawable/ic_refresh_black_24dp"/>
+    <item
+            android:id="@+id/reversible"
+            app:showAsAction="never"
+            android:title="@string/allow_reverse_words"
+            android:checkable="true"/>
+</menu>

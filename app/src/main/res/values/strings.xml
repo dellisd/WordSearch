@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Word Search</string>
+    <string name="new_word_search">New Word Search</string>
+    <string name="allow_reverse_words">Allow Reverse Words</string>
 </resources>

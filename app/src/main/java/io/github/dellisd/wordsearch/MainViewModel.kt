@@ -13,8 +13,14 @@ class MainViewModel(private val generator: WordSearchFactory) : ViewModel() {
     private val _wordSearch = MutableLiveData<WordSearch>()
     val wordSearch: LiveData<WordSearch> = _wordSearch
 
+    private val _textGrid = MutableLiveData<Array<Array<Char>>>()
+    val textGrid: LiveData<Array<Array<Char>>> = _textGrid
+
+    var allowReverseWords = true
+
     fun generateWordSearch() {
-        _wordSearch.value = generator.generateWordSearch(words)
+        _wordSearch.value = generator.generateWordSearch(words, allowReverseWords)
+        _textGrid.value = _wordSearch.value!!.grid
     }
 
     fun selectCell(cell: Cell): Boolean {

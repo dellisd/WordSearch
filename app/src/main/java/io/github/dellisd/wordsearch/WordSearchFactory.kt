@@ -9,8 +9,10 @@ class WordSearchFactory(
 ) {
     private val randomInstance = Random(Date().time)
     private val letterPool = 'A'..'Z'
+    private val noReverseDirections =
+        arrayOf(PlacementDirection.HORIZONTAL, PlacementDirection.VERTICAL, PlacementDirection.DIAGONAL)
 
-    fun generateWordSearch(words: List<String>): WordSearch {
+    fun generateWordSearch(words: List<String>, reversible: Boolean = true): WordSearch {
         val output = Array(gridSize) { Array(gridSize) { Char.MIN_VALUE } }
         val placedWords = mutableListOf<Word>()
 
@@ -26,7 +28,8 @@ class WordSearchFactory(
                     (0 until gridSize).random(randomInstance)
                 )
 
-                val placement = PlacementDirection.values().random(randomInstance)
+                val placement =
+                    if (reversible) PlacementDirection.values().random(randomInstance) else noReverseDirections.random()
 
                 if (!checkPlacement(word, start, placement)) continue
                 if (checkOverlaps(output, word, start, placement)) {

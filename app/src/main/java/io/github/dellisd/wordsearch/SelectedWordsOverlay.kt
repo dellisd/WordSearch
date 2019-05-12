@@ -69,6 +69,7 @@ class SelectedWordsOverlay @JvmOverloads constructor(context: Context, attrs: At
 
     fun clearWords() {
         words.clear()
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas?) {
