@@ -34,7 +34,10 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this, viewModelFactory)[MainViewModel::class.java]
 
-        viewModel.generateWordSearch()
+        if (viewModel.wordSearch.value == null) {
+            viewModel.generateWordSearch()
+        }
+
         viewModel.wordSearch.observe(this, Observer { (letterGrid, words) ->
             if (letterGrid.size != textViewGrid.size) return@Observer
 
@@ -44,18 +47,22 @@ class MainActivity : AppCompatActivity() {
             val overlay = findViewById<SelectedWordsOverlay>(R.id.selectedWordsOverlay)
             overlay.clearWords()
             words.forEach { word ->
-                val (text, _, _, _, found) = word
-                val chip = Chip(this)
-                chip.text = text
-                chip.isCheckable = true
-                chip.isChecked = found
+                val (wordText, _, _, _, found) = word
+                Chip(this).apply {
+                    text = wordText
+                    isCheckable = true
+                    isChecked = found
+                    chipGroup.addView(this)
+                    // Disable all touch events on the chips
+                    setOnTouchListener { _, _ ->  true }
+                }
+
                 if (found) {
                     overlay.addWord(word)
                 }
-
-                chipGroup.addView(chip)
             }
         })
+
         viewModel.textGrid.observe(this, Observer { letterGrid ->
             letterGrid.forEachIndexed { i, row ->
                 row.forEachIndexed { j, col ->
@@ -135,7 +142,8 @@ class MainActivity : AppCompatActivity() {
                 viewModel.allowReverseWords = !item.isChecked
                 item.isChecked = !item.isChecked
             }
-            else -> {}
+            else -> {
+            }
         }
 
         return super.onOptionsItemSelected(item)
