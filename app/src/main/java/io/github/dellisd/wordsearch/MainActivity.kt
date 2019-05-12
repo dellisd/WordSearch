@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,13 +32,23 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this, viewModelFactory)[MainViewModel::class.java]
 
         viewModel.generateWordSearch()
-        viewModel.wordSearch.observe(this, Observer { (letterGrid, _) ->
+        viewModel.wordSearch.observe(this, Observer { (letterGrid, words) ->
             if (letterGrid.size != textViewGrid.size) return@Observer
 
             letterGrid.forEachIndexed { i, row ->
                 row.forEachIndexed { j, col ->
                     textViewGrid[i][j].text = col.toString()
                 }
+            }
+
+            val chipGroup = findViewById<ChipGroup>(R.id.chipGroup)
+            chipGroup.removeAllViews()
+
+            words.forEach { (text) ->
+                val chip = Chip(this)
+                chip.text = text
+
+                chipGroup.addView(chip)
             }
         })
     }
