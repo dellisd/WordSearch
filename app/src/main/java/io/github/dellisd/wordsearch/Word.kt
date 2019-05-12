@@ -2,8 +2,8 @@ package io.github.dellisd.wordsearch
 
 data class Word(
     val text: String,
-    val x: Int,
-    val y: Int,
+    val start: Cell,
+    val end: Cell,
     val placementDirection: PlacementDirection,
     val found: Boolean = false
 )

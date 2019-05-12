@@ -21,14 +21,17 @@ class WordSearchFactory(
         sortedWords.forEach { word ->
             var placed = false
             while (!placed) {
-                val x = (0 until gridSize).random(randomInstance)
-                val y = (0 until gridSize).random(randomInstance)
+                val start = Cell(
+                    (0 until gridSize).random(randomInstance),
+                    (0 until gridSize).random(randomInstance)
+                )
+
                 val placement = PlacementDirection.values().random(randomInstance)
 
-                if (!checkPlacement(word, x, y, placement)) continue
-                if (checkOverlaps(output, word, x, y, placement)) {
+                if (!checkPlacement(word, start, placement)) continue
+                if (checkOverlaps(output, word, start, placement)) {
                     placed = true
-                    placedWords.add(placeWord(output, word, x, y, placement))
+                    placedWords.add(placeWord(output, word, start, placement))
                 }
             }
         }
@@ -50,21 +53,21 @@ class WordSearchFactory(
      * bounds of the grid.
      *
      * @param word The word being placed
-     * @param x The target x position of the beginning of the word
-     * @param y The target y position of the beginning of the word
+     * @param start The cell where the word starts
      * @param placement The placement direction for the word
      * @see PlacementDirection
      *
      * @return Whether or not the word can be placed on the board
      */
-    private fun checkPlacement(word: String, x: Int, y: Int, placement: PlacementDirection): Boolean {
+    private fun checkPlacement(word: String, start: Cell, placement: PlacementDirection): Boolean {
+        val (row, col) = start
         return when (placement) {
-            PlacementDirection.VERTICAL -> y + word.length < gridSize
-            PlacementDirection.VERTICAL_REVERSE -> y - word.length > 0
-            PlacementDirection.HORIZONTAL -> x + word.length < gridSize
-            PlacementDirection.HORIZONTAL_REVERSE -> x - word.length > 0
-            PlacementDirection.DIAGONAL -> y + word.length < gridSize && x + word.length < gridSize
-            PlacementDirection.DIAGONAL_REVERSE -> y - word.length > 0 && x - word.length > 0
+            PlacementDirection.VERTICAL -> row + word.length < gridSize
+            PlacementDirection.VERTICAL_REVERSE -> row - word.length > 0
+            PlacementDirection.HORIZONTAL -> col + word.length < gridSize
+            PlacementDirection.HORIZONTAL_REVERSE -> col - word.length > 0
+            PlacementDirection.DIAGONAL -> row + word.length < gridSize && col + word.length < gridSize
+            PlacementDirection.DIAGONAL_REVERSE -> row - word.length > 0 && col - word.length > 0
         }
     }
 
@@ -73,8 +76,7 @@ class WordSearchFactory(
      * share a common letter at the overlap position.
      *
      * @param grid The grid the word is being placed on
-     * @param x The target x position of the beginning of the word
-     * @param y The target y position of the beginning of the word
+     * @param start The cell where the word starts
      * @param placement The placement direction for the word
      * @see PlacementDirection
      *
@@ -83,25 +85,14 @@ class WordSearchFactory(
     private fun checkOverlaps(
         grid: Array<Array<Char>>,
         word: String,
-        x: Int,
-        y: Int,
+        start: Cell,
         placement: PlacementDirection
     ): Boolean {
         // Iterate through each letter of the word and check for overlap at the corresponding grid position
         word.forEachIndexed { index, c ->
-            val nX = when (placement) {
-                PlacementDirection.HORIZONTAL, PlacementDirection.DIAGONAL -> x + index
-                PlacementDirection.HORIZONTAL_REVERSE, PlacementDirection.DIAGONAL_REVERSE -> x - index
-                else -> x
-            }
+            val (row, col) = start.plus(index, placement)
 
-            val nY = when (placement) {
-                PlacementDirection.VERTICAL, PlacementDirection.DIAGONAL -> y + index
-                PlacementDirection.VERTICAL_REVERSE, PlacementDirection.DIAGONAL_REVERSE -> y - index
-                else -> y
-            }
-
-            if (grid[nY][nX] != Char.MIN_VALUE && grid[nY][nX] != c) {
+            if (grid[row][col] != Char.MIN_VALUE && grid[row][col] != c) {
                 return false
             }
         }
@@ -109,24 +100,14 @@ class WordSearchFactory(
         return true
     }
 
-    private fun placeWord(grid: Array<Array<Char>>, word: String, x: Int, y: Int, placement: PlacementDirection): Word {
+    private fun placeWord(grid: Array<Array<Char>>, word: String, start: Cell, placement: PlacementDirection): Word {
         word.forEachIndexed { index, c ->
-            val nX = when (placement) {
-                PlacementDirection.HORIZONTAL, PlacementDirection.DIAGONAL -> x + index
-                PlacementDirection.HORIZONTAL_REVERSE, PlacementDirection.DIAGONAL_REVERSE -> x - index
-                else -> x
-            }
+            val (row, col) = start.plus(index, placement)
 
-            val nY = when (placement) {
-                PlacementDirection.VERTICAL, PlacementDirection.DIAGONAL -> y + index
-                PlacementDirection.VERTICAL_REVERSE, PlacementDirection.DIAGONAL_REVERSE -> y - index
-                else -> y
-            }
-
-            grid[nY][nX] = c
+            grid[row][col] = c
         }
 
-        return Word(word, x, y, placement)
+        return Word(word, start, start.plus(word.length - 1, placement), placement)
     }
 
 }

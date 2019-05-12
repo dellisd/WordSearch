@@ -1,8 +1,10 @@
 package io.github.dellisd.wordsearch
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.MotionEvent
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -46,8 +48,9 @@ class MainActivity : AppCompatActivity() {
             chipGroup.removeAllViews()
 
             words.forEach { (text, _, _, _, found) ->
-                val chip = Chip(this)
+                val chip = Chip(this, null, R.style.Widget_MaterialComponents_Chip_Filter)
                 chip.text = text
+                chip.isCheckable = true
                 chip.isChecked = found
 
                 chipGroup.addView(chip)
@@ -61,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         textViewGrid =
             Array(gridSize) { i ->
                 Array(gridSize) { j ->
-                    createTextCell(j, i, grid)
+                    createTextCell(i, j, grid)
                 }
             }
     }
@@ -73,6 +76,16 @@ class MainActivity : AppCompatActivity() {
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
         tag = Cell(row, col)
         setOnClickListener { gridInteraction(this) }
+        setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                cellHighlight(this)
+            } else if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_OUTSIDE) {
+                cellUnHighlight(this)
+                gridInteraction(this)
+            }
+
+            true
+        }
 
         layoutParams = GridLayout.LayoutParams().apply {
             height = GridLayout.LayoutParams.WRAP_CONTENT
@@ -84,9 +97,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun gridInteraction(cell: TextView) {
-        val (row, col) = cell.tag as Cell
-        viewModel.selectCell(row, col)
+        viewModel.selectCell(cell.tag as Cell)
 
         // TODO: Handle word selection UI
+    }
+
+    private fun cellHighlight(cell: TextView) {
+        cell.setBackgroundColor(Color.parseColor("#FF0000"))
+    }
+
+    private fun cellUnHighlight(cell: TextView) {
+        cell.setBackgroundColor(Color.parseColor("#00FF0000"))
     }
 }
