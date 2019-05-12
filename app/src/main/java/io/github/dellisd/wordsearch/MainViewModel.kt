@@ -23,10 +23,10 @@ class MainViewModel(private val generator: WordSearchFactory) : ViewModel() {
         _textGrid.value = _wordSearch.value!!.grid
     }
 
-    fun selectCell(cell: Cell): Boolean {
+    fun selectCell(cell: Cell) {
         if (firstSelectedCell == null) {
             firstSelectedCell = cell
-            return true
+            return
         }
 
         val firstCell = firstSelectedCell!!
@@ -44,8 +44,6 @@ class MainViewModel(private val generator: WordSearchFactory) : ViewModel() {
                 return@forEach
             }
         }
-
-        return true
     }
 
 }
