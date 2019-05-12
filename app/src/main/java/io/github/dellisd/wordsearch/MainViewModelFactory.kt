@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import java.lang.IllegalArgumentException
 
-class MainViewModelFactory(private val wordSearchGenerator: WordSearchGenerator) : ViewModelProvider.Factory {
+class MainViewModelFactory(private val wordSearchGenerator: WordSearchFactory) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

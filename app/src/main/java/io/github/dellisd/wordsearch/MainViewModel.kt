@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class MainViewModel(private val generator: WordSearchGenerator) : ViewModel() {
+class MainViewModel(private val generator: WordSearchFactory) : ViewModel() {
 
-    private val _letterGrid = MutableLiveData<Array<Array<Char>>>()
-    val letterGrid: LiveData<Array<Array<Char>>> = _letterGrid
+    private val _wordSearch = MutableLiveData<WordSearch>()
+    val wordSearch: LiveData<WordSearch> = _wordSearch
 
     fun generateWordSearch() {
-
+        _wordSearch.value = generator.generateWordSearch()
     }
 
 }
