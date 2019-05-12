@@ -18,7 +18,6 @@ class MainViewModel(private val generator: WordSearchFactory) : ViewModel() {
     }
 
     fun selectCell(cell: Cell): Boolean {
-        Log.i("ViewModel", "Selected $cell")
         if (firstSelectedCell == null) {
             firstSelectedCell = cell
             return true
@@ -34,8 +33,6 @@ class MainViewModel(private val generator: WordSearchFactory) : ViewModel() {
                 val newList = search.words.map {
                     if (it.text == word.text) it.copy(found = true) else it
                 }
-
-                Log.i("WordSearch", "Found $word")
 
                 _wordSearch.value = search.copy(words = newList)
                 return@forEach

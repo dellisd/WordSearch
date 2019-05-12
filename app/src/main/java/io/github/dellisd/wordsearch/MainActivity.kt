@@ -44,14 +44,21 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+
             val chipGroup = findViewById<ChipGroup>(R.id.chipGroup)
             chipGroup.removeAllViews()
 
-            words.forEach { (text, _, _, _, found) ->
-                val chip = Chip(this, null, R.style.Widget_MaterialComponents_Chip_Filter)
+            val overlay = findViewById<SelectedWordsOverlay>(R.id.selectedWordsOverlay)
+            overlay.clearWords()
+            words.forEach { word ->
+                val (text, _, _, _, found) = word
+                val chip = Chip(this)
                 chip.text = text
                 chip.isCheckable = true
                 chip.isChecked = found
+                if (found) {
+                    overlay.addWord(word)
+                }
 
                 chipGroup.addView(chip)
             }
@@ -67,6 +74,8 @@ class MainActivity : AppCompatActivity() {
                     createTextCell(i, j, grid)
                 }
             }
+
+        findViewById<SelectedWordsOverlay>(R.id.selectedWordsOverlay).attachedGrid = textViewGrid
     }
 
     private fun createTextCell(row: Int, col: Int, gridLayout: GridLayout): TextView = TextView(this).apply {
