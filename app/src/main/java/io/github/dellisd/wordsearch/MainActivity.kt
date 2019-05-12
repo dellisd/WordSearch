@@ -59,14 +59,13 @@ class MainActivity : AppCompatActivity() {
         textViewGrid =
             Array(gridSize) { i ->
                 Array(gridSize) { j ->
-                    createTextCell(i, j, grid)
+                    createTextCell(grid)
                 }
             }
     }
 
-    private fun createTextCell(row: Int, col: Int, gridLayout: GridLayout): TextView = TextView(this).apply {
+    private fun createTextCell(gridLayout: GridLayout): TextView = TextView(this).apply {
         gridLayout.addView(this)
-        text = "$row,$col"
         textAlignment = TextView.TEXT_ALIGNMENT_CENTER
         gravity = Gravity.CENTER
 

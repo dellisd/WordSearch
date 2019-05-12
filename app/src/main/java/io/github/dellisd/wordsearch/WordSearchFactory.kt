@@ -5,13 +5,12 @@ import kotlin.random.Random
 
 // "Kotlin", "Swift", "ObjectiveC", "Variable", "Java", "Mobile"
 class WordSearchFactory(
-    var words: List<String> = listOf("Kotlin", "Swift", "ObjectiveC", "Variable", "Java", "Mobile"),
     var gridSize: Int = 10
 ) {
     private val randomInstance = Random(Date().time)
     private val letterPool = 'A'..'Z'
 
-    fun generateWordSearch(): WordSearch {
+    fun generateWordSearch(words: List<String>): WordSearch {
         val output = Array(gridSize) { Array(gridSize) { Char.MIN_VALUE } }
         val placedWords = mutableListOf<Word>()
 
