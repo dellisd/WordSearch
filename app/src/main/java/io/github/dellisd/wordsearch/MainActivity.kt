@@ -1,6 +1,7 @@
 package io.github.dellisd.wordsearch
 
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Gravity
 import android.widget.GridLayout
 import android.widget.TextView
@@ -44,9 +45,10 @@ class MainActivity : AppCompatActivity() {
             val chipGroup = findViewById<ChipGroup>(R.id.chipGroup)
             chipGroup.removeAllViews()
 
-            words.forEach { (text) ->
+            words.forEach { (text, _, _, _, found) ->
                 val chip = Chip(this)
                 chip.text = text
+                chip.isChecked = found
 
                 chipGroup.addView(chip)
             }
@@ -59,15 +61,18 @@ class MainActivity : AppCompatActivity() {
         textViewGrid =
             Array(gridSize) { i ->
                 Array(gridSize) { j ->
-                    createTextCell(grid)
+                    createTextCell(j, i, grid)
                 }
             }
     }
 
-    private fun createTextCell(gridLayout: GridLayout): TextView = TextView(this).apply {
+    private fun createTextCell(row: Int, col: Int, gridLayout: GridLayout): TextView = TextView(this).apply {
         gridLayout.addView(this)
         textAlignment = TextView.TEXT_ALIGNMENT_CENTER
         gravity = Gravity.CENTER
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+        tag = Cell(row, col)
+        setOnClickListener { gridInteraction(this) }
 
         layoutParams = GridLayout.LayoutParams().apply {
             height = GridLayout.LayoutParams.WRAP_CONTENT
@@ -76,5 +81,12 @@ class MainActivity : AppCompatActivity() {
             columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f)
             rowSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f)
         }
+    }
+
+    private fun gridInteraction(cell: TextView) {
+        val (row, col) = cell.tag as Cell
+        viewModel.selectCell(row, col)
+
+        // TODO: Handle word selection UI
     }
 }

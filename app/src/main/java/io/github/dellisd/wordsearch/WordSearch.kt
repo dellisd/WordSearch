@@ -22,19 +22,3 @@ data class WordSearch(
         return result
     }
 }
-
-data class Word(
-    val text: String,
-    val x: Int,
-    val y: Int,
-    val placementDirection: PlacementDirection
-)
-
-enum class PlacementDirection {
-    VERTICAL,
-    VERTICAL_REVERSE,
-    HORIZONTAL,
-    HORIZONTAL_REVERSE,
-    DIAGONAL,
-    DIAGONAL_REVERSE
-}
