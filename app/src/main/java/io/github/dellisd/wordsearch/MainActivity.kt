@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSupportActionBar(findViewById(R.id.toolbar))
         findViewById<GridLayout>(R.id.verticalContainer).apply {
             rowCount = gridSize
             columnCount = gridSize
