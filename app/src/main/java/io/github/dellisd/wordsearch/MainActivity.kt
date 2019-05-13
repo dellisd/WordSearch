@@ -1,12 +1,15 @@
 package io.github.dellisd.wordsearch
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
 import androidx.core.view.get
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -20,6 +23,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
     private val viewModelFactory: MainViewModelFactory by lazy { MainViewModelFactory(WordSearchFactory(gridSize = gridSize)) }
+
+    private var firstTouchedCell: Cell? = null
+    private var lastTouchedCell: Cell? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                     isChecked = found
                     chipGroup.addView(this)
                     // Disable all touch events on the chips
-                    setOnTouchListener { _, _ ->  true }
+                    setOnTouchListener { _, _ -> true }
                 }
 
                 if (found) {
@@ -72,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun createTextGrid() {
         val grid = findViewById<GridLayout>(R.id.verticalContainer)
 
@@ -83,6 +90,49 @@ class MainActivity : AppCompatActivity() {
             }
 
         findViewById<SelectedWordsOverlay>(R.id.selectedWordsOverlay).attachedGrid = textViewGrid
+
+        grid.setOnTouchListener { v, event ->
+            // Check if the user highlighted a word when they lift their finger
+            if (event.action == MotionEvent.ACTION_UP) {
+                if (viewModel.verifySelection(firstTouchedCell!!, lastTouchedCell!!)) {
+                    v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                }
+
+                lastTouchedCell = null
+                firstTouchedCell = null
+
+                findViewById<SelectedWordsOverlay>(R.id.selectedWordsOverlay).apply {
+                    previewEndCell = null
+                    previewStartCell = null
+                }
+                return@setOnTouchListener true
+            }
+
+            val x = Math.round(event.x)
+            val y = Math.round(event.y)
+
+            // Get the TextView cell that is currently under the user's finger
+            grid.children.forEach { child ->
+                if (x > child.left && x < child.right && y > child.top && y < child.bottom) {
+                    val overlay = findViewById<SelectedWordsOverlay>(R.id.selectedWordsOverlay)
+                    if (lastTouchedCell !== child.tag) {
+                        child.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                        // Set the end cell posiition for the preview
+                        overlay.previewEndCell = child.tag as Cell
+                    }
+
+                    if (firstTouchedCell == null) {
+                        firstTouchedCell = child.tag as Cell
+                        // Set the start cell position for the preview overlay
+                        overlay.previewStartCell = firstTouchedCell
+                    } else {
+                        lastTouchedCell = child.tag as Cell
+                    }
+                }
+            }
+
+            true
+        }
     }
 
     private fun createTextCell(row: Int, col: Int, gridLayout: GridLayout): TextView = TextView(this).apply {
@@ -91,39 +141,14 @@ class MainActivity : AppCompatActivity() {
         gravity = Gravity.CENTER
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
         tag = Cell(row, col)
-        setOnClickListener { gridInteraction(this) }
-        setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                cellHighlight(this)
-            } else if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_OUTSIDE) {
-                cellUnHighlight(this)
-                gridInteraction(this)
-            }
-
-            true
-        }
 
         layoutParams = GridLayout.LayoutParams().apply {
             height = GridLayout.LayoutParams.WRAP_CONTENT
             width = GridLayout.LayoutParams.WRAP_CONTENT
-            setGravity(Gravity.CENTER)
+            setGravity(Gravity.CENTER or Gravity.FILL)
             columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f)
             rowSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f)
         }
-    }
-
-    private fun gridInteraction(cell: TextView) {
-        viewModel.selectCell(cell.tag as Cell)
-
-        // TODO: Handle word selection UI
-    }
-
-    private fun cellHighlight(cell: TextView) {
-        cell.setBackgroundColor(Color.parseColor("#FF0000"))
-    }
-
-    private fun cellUnHighlight(cell: TextView) {
-        cell.setBackgroundColor(Color.parseColor("#00FF0000"))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
