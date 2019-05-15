@@ -7,12 +7,14 @@ is created. The words can be vertical, horizontal, diagonal, and the reverse of 
 
 To mark the words as found, simply swipe from the start to the end of the word. The word will be highlighted and checked off from the list.
 
+To restart, select "New Word Search" from the dropdown menu.
+
 ## Build Instructions
 
 Clone into Android Studio and build/run.
 
 ## Screenshots
 
-![No words found](screenshots/device-2019-05-15-000011.png)
+![No words found](screenshots/device-2019-05-15-000011.png "No words found")
 
-![All words found](screenshots/device-2019-05-15-000058.png)
+![All words found](screenshots/device-2019-05-15-000058.png "All words found")
