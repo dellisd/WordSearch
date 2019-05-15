@@ -38,6 +38,8 @@ class SelectedWordsOverlay @JvmOverloads constructor(context: Context, attrs: At
                 previewStartY = null
                 previewEndX = null
                 previewEndY = null
+                previewAnimator?.cancel()
+                previewAnimator = null
                 invalidate()
             }
         }
@@ -156,9 +158,7 @@ class SelectedWordsOverlay @JvmOverloads constructor(context: Context, attrs: At
         val propertyEndY = PropertyValuesHolder.ofFloat("EY", previewEndY ?: endY, endY)
 
         // Cancel any previous animations
-        if (previewAnimator != null) {
-            previewAnimator?.cancel()
-        }
+        previewAnimator?.cancel()
 
         // Give the preview a quick animation as it snaps to the new location
         previewAnimator = ValueAnimator().apply {
